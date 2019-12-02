@@ -18,7 +18,7 @@ conn.connect(function(err){
 
 
 app.post('/signup',function(req,res){
-    console.log("Request ::"+req.body);
+    console.log(">>>>> Request ::"+req.body);
 
     var name=req.body.user_name;
     var emailId=req.body.email_id;
@@ -53,6 +53,19 @@ app.post('/signup',function(req,res){
          res.status(200).send(req.body);
     });
 
+});
+
+app.post('/login',function(req,res){
+    console.log(">>>>> Request ::"+req.body);
+
+    var phoneNumber=req.body.phone_number;
+    var password=req.body.password;
+
+    var sql=`select * from user where phone_number=? && user_password=?`;
+    conn.query(sql,[phoneNumber,password],function(error,result,fields){
+        console.log('Query executed'+result);
+        res.status(200).send(req.body);
+    });
 });
 
 var server=app.listen(8080,function(){
