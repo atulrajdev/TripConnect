@@ -8,47 +8,50 @@ app.use(bodyParser.json());
 var conn=mysql.createConnection({
     "host":"localhost",
     "user":"root",
-    "password":"root",
+    "password":"root@1234",
     "database":"TripConnect"
 });
 
 conn.connect(function(err){
   console.log(">>>>> Connected"+">>>>>"+err+">>>>>"+err);
-  var sql="insert into user(user_name) values('Amit Sharma')";
-  console.log("Query ::"+sql);
-
-  conn.query(sql,function(error,result,fields){
-       console.log('Error ::'+error);
-       console.log('Result ::'+result);
-  });
 });
 
 
 app.post('/signup',function(req,res){
-  console.log("Request ::"+req.body);
+    console.log("Request ::"+req.body);
 
-  var name=req.body.user_name;
-  var emailId=req.body.email_id;
+    var name=req.body.user_name;
+    var emailId=req.body.email_id;
 
-  var countryCode=req.body.country_code;
-  var phoneNumber=req.body.phone_number;
-  var country=req.body.country;
+    var countryCode=req.body.country_code;
+    var phoneNumber=req.body.phone_number;
+    var country=req.body.country;
 
-  var address=req.body.address;
-  var profilePic=req.body.profile_pic;
+    var address=req.body.address;
+    var profilePic=req.body.profile_pic;
 
-  var dateOfBirth=req.body.date_of_birth;
-  var password=req.body.password;
-  var pincode=req.body.pincode;
+    var dateOfBirth=req.body.date_of_birth;
+    var password=req.body.user_password;
+    var pincode=req.body.pincode;
 
-  var latitude=req.body.latitude;
-  var longitude=req.body.longitude;
+    var latitude=req.body.latitude;
+    var longitude=req.body.longitude;
 
-  var socialType=req.body.social_type;
-  var socialId=req.body.social_id;
+    var socialType=req.body.social_type;
+    var socialId=req.body.social_id;
 
-  console.log("Name ::"+name);
-  console.log("Address ::"+address);
+    console.log("Name ::"+name);
+    console.log("Address ::"+address);
+
+    var sql=`insert into user(user_name,email_id,country_code,phone_number,user_password,country,pincode) values(?,?,?,?,?,?,?)`;
+
+    console.log("Query ::"+sql);
+
+    conn.query(sql,[name,emailId,countryCode,phoneNumber,password,country,pincode],function(error,result,fields){
+         console.log('Error ::'+error);
+         console.log('Result ::'+result);
+         res.status(200).send(req.body);
+    });
 
 });
 
