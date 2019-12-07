@@ -2,9 +2,27 @@ var express=require('express');
 var mysql=require('mysql');
 var bodyParser=require('body-parser')
 var app=express();
+var multer=require('multer')
 var constants=require('./constants')
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:true}))
+app.use('/uploads', express.static(__dirname + '/uploads'));
+
+
+// Setting Storage
+var storage=multer.diskStorage({
+    destination:function(req,file,cb){
+        cb(null,'uploads')
+    },
+    filename:function(req,file,cb){
+        cb(null,file.fieldname+"-"+Date.now()+".png")
+    }
+});
+
+var upload=multer({storage:storage});
+
+
 
 var conn=mysql.createConnection({
     "host":"localhost",
@@ -15,6 +33,11 @@ var conn=mysql.createConnection({
 
 conn.connect(function(err){
   console.log(">>>>> Connected"+">>>>>"+err+">>>>>"+err);
+});
+
+
+app.get('/',function(req,res){
+    res.status(constants.HTTP_SUCCESS).send("Welcome");
 });
 
 
@@ -181,6 +204,43 @@ app.get('/users/:id',function(req,res){
 
 });
 
+app.post('/upload',upload.single('profile_pic'),function(req,res,next){
+    var file=req.file;
+    var user_id=req.body.user_id;
+
+//    console.log(req);
+//    console.log(">>>>> user_id"+user_id);
+    if(!file){
+       var response={
+            code:constants.CODE_SUCCESS,
+            message:"Please select a file to upload"
+       };
+
+       res.status(constants.HTTP_SUCCESS).send(response);
+
+    }else{
+
+        var sql=`update user set profile_pic=? where user_id = ?`;
+
+        conn.query(sql,[file.path,user_id],function(error,result,fields){
+            if(error)throw error;
+
+            var response={
+                    code:constants.CODE_SUCCESS,
+                    message:"File uploaded successfully",
+                    data:{
+                        user_id:user_id,
+                        profile_url:file.path
+                    }
+            };
+
+            res.status(constants.HTTP_SUCCESS).send(response);
+
+        });
+
+    }
+});
+
 var server=app.listen(8080,function(){
     console.log("Server is running on port 8080");
     console.log("Port     ::"+server.address().port);
@@ -221,3 +281,4 @@ create table user(
 
 */
 
+//https://code.tutsplus.com/tutorials/file-upload-with-multer-in-node--cms-32088
