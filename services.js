@@ -35,7 +35,7 @@ conn.connect(function(err){
   console.log(">>>>> Connected"+">>>>>"+err+">>>>>"+err);
 });
 
-
+// It will print welcome message
 app.get('/',function(req,res){
     res.status(constants.HTTP_SUCCESS).send("Welcome");
 });
